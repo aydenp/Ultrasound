@@ -1,0 +1,3 @@
+[submodule "DDSettings"]
+	path = DDSettings
+	url = git.dynastic.co:/dynastic/DDSettings
