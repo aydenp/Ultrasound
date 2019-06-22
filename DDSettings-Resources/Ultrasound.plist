@@ -148,7 +148,7 @@
             <key>label</key>
             <string>Behaviour</string>
 			<key>footerText</key>
-			<string>Play Haptic Feedback when adjusting the volume reaches 0% or 100%.</string>
+			<string>Play Haptic Feedback when adjusting the volume reaches 0% or 100%. Requires iPhone 7 or later.</string>
         </dict>
 		<dict>
 			<key>cell</key>
