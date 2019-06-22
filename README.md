@@ -10,7 +10,7 @@ If you find a bug or code issue, report it on the [issues page](/issues). Keep i
 
 ## Contributing
 
-Feel free to contribute to the source code of Bank to make it something even better! Just try to adhere to the general coding style throughout, to make it as readable as possible.
+Feel free to contribute to the source code of Ultrasound to make it something even better! Just try to adhere to the general coding style throughout, to make it as readable as possible.
 
 ## License
 
