@@ -6,7 +6,7 @@ A new take on the iOS volume HUD. A mobile substrate tweak.
 
 ## Reporting Issues
 
-If you find a bug or code issue, report it on the [issues page](/issues). Keep in mind that this is for actual bugs, **NOT BUILD ISSUES**. 
+If you find a bug or code issue, report it on the [issues page](https://github.com/aydenp/Ultrasound/issues). Keep in mind that this is for actual bugs, **NOT BUILD ISSUES**.
 
 ## Contributing
 
