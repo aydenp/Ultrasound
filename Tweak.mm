@@ -16,8 +16,33 @@
 @interface VolumeControl (Additions)
 - (void)updateSliderVolumeWithNotification:(NSNotification *)note;
 - (void)volumeHUDControlHidden;
-- (void)__presentVolumeHUDWithMode:(int)mode;
+- (BOOL)__us_presentVolumeHUDWithMode:(int)mode volume:(float)volume;
+- (void)__us_presentVolumeHUDWithMode:(int)mode;
 @end
+
+// MARK: - Convenience
+
+static void wakeScreen() {
+    [[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0x5 withOptions:@{@"SBUIUnlockOptionsStartFadeInAnimation": @YES, @"SBUIUnlockOptionsTurnOnScreenFirstKey": @YES}];
+    [[%c(SBScreenWakeAnimationController) sharedInstance] _startWakeIfNecessary];
+}
+
+static SBLockScreenViewControllerBase *getLockScreenViewController() {
+    SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+    if ([manager respondsToSelector:@selector(coverSheetViewController)]) return [manager coverSheetViewController];
+    if ([manager respondsToSelector:@selector(lockScreenViewController)]) return [manager lockScreenViewController];
+    return nil;
+}
+
+static VolumeControl *getVolumeControl() {
+    Class iOS12Class = NSClassFromString(@"VolumeControl");
+    if (iOS12Class && [iOS12Class respondsToSelector:@selector(sharedVolumeControl)]) return [iOS12Class sharedVolumeControl];
+
+    Class iOS13Class = NSClassFromString(@"SBVolumeControl");
+    if (iOS13Class && [iOS13Class respondsToSelector:@selector(sharedInstance)]) return [iOS13Class sharedInstance];
+
+    return nil;
+}
 
 // MARK: - Settings
 
@@ -42,8 +67,10 @@ static void applySettings() {
     [ABVolumeHUDViewSettings sharedSettings].showOLEDVolumePercentage = showOLEDVolumePercentage;
     [ABVolumeHUDManager sharedManager].theme = themeName ? [[NSClassFromString(themeName) alloc] init] : nil;
     [ABVolumeHUDViewSettings sharedSettings].style = volumeStyle;
-    if ((themeChanged || styleChanged) && enabled) [[%c(VolumeControl) sharedVolumeControl] __presentVolumeHUDWithMode:0];
     [ABVolumeHUDViewSettings sharedSettings].enableHapticFeedback = enableHapticFeedback;
+
+    // If we changed theme or style, show the volume HUD for a preview
+    if ((themeChanged || styleChanged) && enabled) [getVolumeControl() __us_presentVolumeHUDWithMode:ABVolumeHUDVolumeModeAudio];
 }
 
 static void loadSettings() {
@@ -111,15 +138,11 @@ static void setInOLEDMode(BOOL isInOLEDMode) {
 
 // MARK: - Hooks
 
-static void wakeScreen() {
-    [[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0x5 withOptions:@{@"SBUIUnlockOptionsStartFadeInAnimation": @YES, @"SBUIUnlockOptionsTurnOnScreenFirstKey": @YES}];
-    [[%c(SBScreenWakeAnimationController) sharedInstance] _startWakeIfNecessary];
-}
-
 static BOOL pretendToNotBeLocked = NO;
 static BOOL isGoingToDisplayOLEDVolume = NO;
 static BOOL isDisplayingOLEDVolume = NO;
 
+// Renamed to SBVolumeControl on iOS 13+
 %hook VolumeControl
 
 - (instancetype)init {
@@ -127,22 +150,17 @@ static BOOL isDisplayingOLEDVolume = NO;
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSliderVolumeWithNotification:) name:kVolumeChangeNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateVolumeModeWithNotification:) name:kVolumeModeChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeHUDControlVisibilityChangedithNotification:) name:kControlVisibilityChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeHUDControlVisibilityChangedWithNotification:) name:kControlVisibilityChangedNotification object:nil];
     }
     return self;
 }
 
 %new
-- (void)__presentVolumeHUDWithMode:(int)mode {
-    [self _presentVolumeHUDWithMode:0 volume:[self getMediaVolume]];
-}
-
-- (void)_presentVolumeHUDWithMode:(int)mode volume:(float)volume {
-    if (!enabled) return %orig;
+- (BOOL)__us_presentVolumeHUDWithMode:(int)mode volume:(float)volume {
+    if (!enabled) return NO;
     createWindowIfNeeded();
-    if (!hudWindow) return %orig;
-    SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
-    if (enableOLEDMode && [manager.lockScreenViewController isInScreenOffMode]) {
+    if (!hudWindow) return NO;
+    if (enableOLEDMode && [getLockScreenViewController() isInScreenOffMode]) {
         // Add black curtain and wake screen for OLED mode
         isGoingToDisplayOLEDVolume = YES;
         changeFakeScreenOffAlpha(1);
@@ -153,6 +171,25 @@ static BOOL isDisplayingOLEDVolume = NO;
         isDisplayingOLEDVolume = YES;
     }
     [[ABVolumeHUDManager sharedManager] volumeChangedTo:volume withMode:(ABVolumeHUDVolumeMode)mode];
+    return YES;
+}
+
+%new
+- (void)__us_presentVolumeHUDWithMode:(int)mode {
+    float volume = [self respondsToSelector:@selector(_getMediaVolumeForIAP)] ? [self _getMediaVolumeForIAP] : [self getMediaVolume];
+    [self __us_presentVolumeHUDWithMode:mode volume:volume];
+}
+
+// Exists only on iOS 13+
+- (void)_presentVolumeHUDWithVolume:(float)volume {
+    if ([self __us_presentVolumeHUDWithMode:ABVolumeHUDVolumeModeAudio volume:volume]) return;
+    %orig;
+}
+
+// Exists only on iOS 12 and below
+- (void)_presentVolumeHUDWithMode:(int)mode volume:(float)volume {
+    if ([self __us_presentVolumeHUDWithMode:mode volume:volume]) return;
+    %orig;
 }
 
 - (BOOL)_HUDIsDisplayableForCategory:(NSString *)category {
@@ -161,7 +198,8 @@ static BOOL isDisplayingOLEDVolume = NO;
     if (manager.isUILocked) {
         // By default, lock screen doesn't show volume HUD, but users likely want to see it on the lock screen with Ultrasound.
         // If the screen is off (OLED mode) or no media controls are shown, we force it to show on the lock screen.
-        return [manager.lockScreenViewController isInScreenOffMode] || ![manager.lockScreenViewController isShowingMediaControls] || %orig;
+        SBLockScreenViewControllerBase *lsViewController = getLockScreenViewController();
+        return [lsViewController isInScreenOffMode] || ![lsViewController isShowingMediaControls] || %orig;
     }
     return %orig;
 }
@@ -177,13 +215,16 @@ static BOOL isDisplayingOLEDVolume = NO;
     [[ABVolumeHUDManager sharedManager].visibilityManager hideImmediatelyIfPossible];
 }
 
+//- US Notifications
+
 %new
 - (void)updateSliderVolumeWithNotification:(NSNotification *)note {
     CGFloat volume = [note.userInfo[@"volume"] floatValue];
     if ([note.userInfo[@"mode"] integerValue] == ABVolumeHUDVolumeModeRinger) {
         [[%c(AVSystemController) sharedAVSystemController] setVolumeTo:volume forCategory:@"Ringtone"];
     } else {
-        [self setMediaVolume:volume];
+        if ([self respondsToSelector:@selector(setMediaVolume:)]) [self setMediaVolume:volume];
+        else if ([self respondsToSelector:@selector(_setMediaVolumeForIAP:)]) [self _setMediaVolumeForIAP:volume];
     }
 }
 
@@ -194,7 +235,7 @@ static BOOL isDisplayingOLEDVolume = NO;
 }
 
 %new
-- (void)volumeHUDControlVisibilityChangedithNotification:(NSNotification *)note {
+- (void)volumeHUDControlVisibilityChangedWithNotification:(NSNotification *)note {
     if ([note.userInfo[@"visible"] boolValue]) return;
     if (![ABVolumeHUDManager sharedManager].oledMode || !isDisplayingOLEDVolume || ((SBBacklightController *)[%c(SBBacklightController) sharedInstance]).screenIsOn) return;
     [[%c(SBBacklightController) sharedInstance] setBacklightFactor:0 source:kWillowBacklightAdjustmentSource];
@@ -223,9 +264,10 @@ static BOOL isDisplayingOLEDVolume = NO;
 
 %hook SBHUDController
 
+// iOS 12 and below
 - (void)presentHUDView:(UIView *)view autoDismissWithDelay:(double)delay {
     // Never show the ringer HUD view (since we still call activate for vibrate)
-    if ([view isKindOfClass:%c(SBRingerHUDView)]) return;
+    if (enabled && [view isKindOfClass:%c(SBRingerHUDView)]) return;
     %orig;
 }
 
@@ -235,7 +277,7 @@ static BOOL isDisplayingOLEDVolume = NO;
 
 - (BOOL)isUILocked {
     // Getting called for the volume HUD presentation requires isUILocked to be NO
-    if (enabled && enableOLEDMode && pretendToNotBeLocked) return NO;
+    // if (enabled && enableOLEDMode && pretendToNotBeLocked) return NO;
     return %orig;
 }
 
@@ -344,7 +386,7 @@ static BOOL isDisplayingOLEDVolume = NO;
 
 %end
 
-%group iOS12
+%group iOS12Up
 
 %hook SBDashBoardViewController
 
@@ -371,6 +413,40 @@ static BOOL isDisplayingOLEDVolume = NO;
 
 %end
 
+%group iOS13Up
+
+%hook SBRingerControl
+
+- (void)activateRingerHUD:(int)arg1 withInitialVolume:(float)initialVolume fromSource:(unsigned long long)source {
+    // Call the original activate method so we get test vibration based on user settings (fix HUD showing below)
+    %orig;
+
+    if (!enabled) return;
+    createWindowIfNeeded();
+    if (!hudWindow) return;
+    [[ABVolumeHUDManager sharedManager] volumeChangedTo:[self volume] withMode:ABVolumeHUDVolumeModeRinger];
+}
+
+- (void)setVolume:(float)volume forKeyPress:(BOOL)forKeyPress {
+    %orig;
+    if (!enabled || !hudWindow) return;
+    [[ABVolumeHUDManager sharedManager] volumeChangedTo:[self volume] withMode:ABVolumeHUDVolumeModeRinger];
+}
+
+%end
+
+// on iOS 13+, the system determines whether or not to vibrate for a ringer change by checking if the HUD is currently presented, so now just literally hide the view
+%hook SBRingerHUDViewController
+
+- (void)viewDidLayoutSubviews {
+    %orig;
+    if (enabled) ((UIViewController *)self).view.hidden = YES;
+}
+
+%end
+
+%end
+
 %ctor {
     @autoreleasepool {
         applySettings();
@@ -388,9 +464,14 @@ static BOOL isDisplayingOLEDVolume = NO;
                                         NULL,
                                         CFNotificationSuspensionBehaviorDeliverImmediately);
 
-        %init(_ungrouped);
+
+        // This is a bit bad™ for future-proofing as apple could change more details of the class, but for now they're mostly the same (save for one method)
+        BOOL isiOS13 = [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){13,0,0}];
+        %init(VolumeControl=objc_getClass(isiOS13 ? "SBVolumeControl" : "VolumeControl"));
+        
+        if (@available(iOS 13.0, *)) %init(iOS13Up);
         if (@available(iOS 12.0, *)) {
-            %init(iOS12);
+            %init(iOS12Up, SBDashBoardViewController=objc_getClass(isiOS13 ? "CSCoverSheetViewController" : "SBDashBoardViewController"));
         } else {
             %init(iOS11);
         }

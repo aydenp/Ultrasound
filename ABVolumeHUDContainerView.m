@@ -268,7 +268,7 @@
     if (![ABVolumeHUDManager sharedManager].volumeInfoProvider) return;
     
     // Get new desired mode
-    ABVolumeHUDVolumeMode newMode = volumeModeInfo.mode == ABVolumeHUDVolumeModeRinger ? ABVolumeHUDVolumeModeAudioVolume : ABVolumeHUDVolumeModeRinger;
+    ABVolumeHUDVolumeMode newMode = volumeModeInfo.mode == ABVolumeHUDVolumeModeRinger ? ABVolumeHUDVolumeModeAudio : ABVolumeHUDVolumeModeRinger;
     
     // Get new display volume
     CGFloat newVolume = [[ABVolumeHUDManager sharedManager].volumeInfoProvider volumeForVolumeMode:newMode];
