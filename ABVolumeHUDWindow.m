@@ -42,4 +42,9 @@
     self.backgroundColor = [UIColor colorWithWhite:0 alpha:darkScreenImitationAlpha];
 }
 
+// Don't control the device's auto-rotation orientation (possible fix for #2)
+- (BOOL)_shouldControlAutorotation {
+    return NO;
+}
+
 @end
