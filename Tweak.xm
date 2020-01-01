@@ -14,6 +14,7 @@
 #define kPrefsAppID CFSTR("applebetas.ios.tweak.willow")
 
 @interface VolumeControl (Additions)
+- (void)__us_commonInit;
 - (void)updateSliderVolumeWithNotification:(NSNotification *)note;
 - (void)volumeHUDControlHidden;
 - (BOOL)__us_presentVolumeHUDWithMode:(int)mode volume:(float)volume;
@@ -145,14 +146,25 @@ static BOOL isDisplayingOLEDVolume = NO;
 // Renamed to SBVolumeControl on iOS 13+
 %hook VolumeControl
 
+// iOS 13+
+- (instancetype)initWithHUDController:(id)arg1 ringerControl:(id)arg2 {
+    self = %orig;
+    if (self) [self __us_commonInit];
+    return self;
+}
+
+// iOS 12 and lower
 - (instancetype)init {
     self = %orig;
-    if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSliderVolumeWithNotification:) name:kVolumeChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateVolumeModeWithNotification:) name:kVolumeModeChangeNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeHUDControlVisibilityChangedWithNotification:) name:kControlVisibilityChangedNotification object:nil];
-    }
+    if (self) [self __us_commonInit];
     return self;
+}
+
+%new
+- (void)__us_commonInit {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateSliderVolumeWithNotification:) name:kVolumeChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateVolumeModeWithNotification:) name:kVolumeModeChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeHUDControlVisibilityChangedWithNotification:) name:kControlVisibilityChangedNotification object:nil];
 }
 
 %new
@@ -221,8 +233,10 @@ static BOOL isDisplayingOLEDVolume = NO;
 - (void)updateSliderVolumeWithNotification:(NSNotification *)note {
     CGFloat volume = [note.userInfo[@"volume"] floatValue];
     if ([note.userInfo[@"mode"] integerValue] == ABVolumeHUDVolumeModeRinger) {
+        // Changing the ringer volume
         [[%c(AVSystemController) sharedAVSystemController] setVolumeTo:volume forCategory:@"Ringtone"];
     } else {
+        // Changing the media volume
         if ([self respondsToSelector:@selector(setMediaVolume:)]) [self setMediaVolume:volume];
         else if ([self respondsToSelector:@selector(_setMediaVolumeForIAP:)]) [self _setMediaVolumeForIAP:volume];
     }
