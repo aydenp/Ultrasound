@@ -10,7 +10,8 @@
 #import "NSObject+SafeKVC.h"
 #import "_ABVolumeHUDOrientationManager.h"
 
-#define kWillowBacklightAdjustmentSource 422
+// Use boot backlight adjustment source as it will never be used by SpringBoard directly
+#define kWillowBacklightAdjustmentSource 15
 #define kPrefsAppID CFSTR("applebetas.ios.tweak.willow")
 
 @interface VolumeControl (Additions)
@@ -177,9 +178,15 @@ static BOOL isDisplayingOLEDVolume = NO;
         isGoingToDisplayOLEDVolume = YES;
         changeFakeScreenOffAlpha(1);
         // Delay a tiny bit to allow curtain to appear on slow phones
-        if (!isDisplayingOLEDVolume) dispatch_after(DISPATCH_TIME_NOW + 0.01, dispatch_get_main_queue(), ^{
-            [[%c(SBBacklightController) sharedInstance] _animateBacklightToFactor:1 duration:0 source:kWillowBacklightAdjustmentSource silently:YES completion:nil];
-        });
+        if (!isDisplayingOLEDVolume) {
+            dispatch_after(DISPATCH_TIME_NOW + 0.01, dispatch_get_main_queue(), ^{
+                [[%c(SBBacklightController) sharedInstance] _animateBacklightToFactor:1 duration:0 source:kWillowBacklightAdjustmentSource silently:YES completion:^{
+                    isDisplayingOLEDVolume = YES;
+                    [[ABVolumeHUDManager sharedManager] volumeChangedTo:volume withMode:(ABVolumeHUDVolumeMode)mode];
+                }];
+            });
+            return YES;
+        } 
         isDisplayingOLEDVolume = YES;
     }
     [[ABVolumeHUDManager sharedManager] volumeChangedTo:volume withMode:(ABVolumeHUDVolumeMode)mode];
