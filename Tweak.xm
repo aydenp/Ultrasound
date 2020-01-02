@@ -312,6 +312,12 @@ static BOOL isDisplayingOLEDVolume = NO;
     return %orig;
 }
 
+- (BOOL)screenIsDim {
+    // If we're in OLED mode, trick system into thinking the screen is dim
+    if (enabled && isDisplayingOLEDVolume) return YES;
+    return %orig;
+}
+
 -(void)_animateBacklightToFactor:(float)factor duration:(double)duration source:(long long)source silently:(BOOL)silently completion:(/*^block*/id)completion {
     if (enableOLEDMode && isDisplayingOLEDVolume && source != kWillowBacklightAdjustmentSource) {
         // Hacky solution to fix animations not working because SpringBoard ignores this wake
@@ -462,18 +468,6 @@ static BOOL isDisplayingOLEDVolume = NO;
 - (void)viewDidLayoutSubviews {
     %orig;
     if (enabled) ((UIViewController *)self).view.hidden = YES;
-}
-
-%end
-
-%hook SBSleepWakeHardwareButtonInteraction
-
-- (BOOL)consumeSinglePressUp {
-    if (enabled && isDisplayingOLEDVolume) {
-        wakeScreen();
-        return YES;
-    }
-    return %orig;
 }
 
 %end
