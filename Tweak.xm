@@ -15,10 +15,10 @@
 
 @interface VolumeControl (Additions)
 - (void)__us_commonInit;
-- (void)updateSliderVolumeWithNotification:(NSNotification *)note;
-- (void)volumeHUDControlHidden;
 - (BOOL)__us_presentVolumeHUDWithMode:(int)mode volume:(float)volume;
 - (void)__us_presentVolumeHUDWithMode:(int)mode;
+- (void)updateSliderVolumeWithNotification:(NSNotification *)note;
+- (void)volumeHUDControlHidden;
 @end
 
 // MARK: - Convenience

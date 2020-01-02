@@ -45,8 +45,7 @@
 }
 
 - (BOOL)shouldDeemphasizeSliderForVolume:(CGFloat)volume {
-    if (_mode == ABVolumeHUDVolumeModeRinger && [self isRingerMuted]) return YES;
-    return nil;
+    return _mode == ABVolumeHUDVolumeModeRinger && [self isRingerMuted];
 }
 
 - (UIView<ABVolumeHUDIconGlyphProviding> *)iconGlyphProvider {
