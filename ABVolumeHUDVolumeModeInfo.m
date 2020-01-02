@@ -10,6 +10,7 @@
 #import "ABVolumeHUDIconVolumeGlyph.h"
 #import "ABVolumeHUDIconRingerGlyph.h"
 #import "Headers.h"
+#import "NSObject+SafeKVC.h"
 
 @implementation ABVolumeHUDVolumeModeInfo
 
@@ -27,25 +28,24 @@
     return YES;
 }
 
+- (BOOL)isRingerMuted {
+    if ([self mediaController] && [[self mediaController] respondsToSelector:@selector(isRingerMuted)]) return [self mediaController].isRingerMuted;
+    if ([self ringerControl] && [[self ringerControl] respondsToSelector:@selector(isRingerMuted)]) return [self ringerControl].isRingerMuted;
+    return NO;
+}
+
 - (NSString *)overrideTextForVolume:(CGFloat)volume {
-    if (_mode == ABVolumeHUDVolumeModeRinger) {
-        if ([self mediaController] && [self mediaController].isRingerMuted) return @"Silent";
-    }
+    if (_mode == ABVolumeHUDVolumeModeRinger && [self isRingerMuted]) return @"Silent";
     return nil;
 }
 
 - (CGFloat)iconVolumeForRealVolume:(CGFloat)volume {
-    if (_mode == ABVolumeHUDVolumeModeRinger) {
-        if ([self mediaController] && [self mediaController].isRingerMuted) return 0;
-    }
+    if (_mode == ABVolumeHUDVolumeModeRinger && [self isRingerMuted]) return 0;
     return volume;
 }
 
 - (BOOL)shouldDeemphasizeSliderForVolume:(CGFloat)volume {
-    if (_mode == ABVolumeHUDVolumeModeRinger) {
-        if ([self mediaController] && [self mediaController].isRingerMuted) return YES;
-    }
-    return nil;
+    return _mode == ABVolumeHUDVolumeModeRinger && [self isRingerMuted];
 }
 
 - (UIView<ABVolumeHUDIconGlyphProviding> *)iconGlyphProvider {
@@ -55,8 +55,14 @@
 
 - (SBMediaController *)mediaController {
     Class mediaControllerClass = NSClassFromString(@"SBMediaController");
-    if (mediaControllerClass) return [mediaControllerClass sharedInstance];
-    return nil;
+    if (!mediaControllerClass) return nil;
+    return [mediaControllerClass sharedInstance];
+}
+
+- (SBRingerControl *)ringerControl {
+    SBMainWorkspace *workspace = [NSClassFromString(@"SBMainWorkspace") sharedInstance];
+    if (![workspace respondsToSelector:@selector(ringerControl)]) return nil;
+    return [workspace ringerControl];
 }
 
 @end

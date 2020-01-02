@@ -24,7 +24,11 @@
 
 - (void)setupForDisplay {
     glyphView = [[NSClassFromString(@"CCUICAPackageView") alloc] init];
-    glyphView.packageDescription = [NSClassFromString(@"CCUICAPackageDescription") descriptionForPackageNamed:kGlyphPackageName inBundle:kGlyphPackageBundle];
+
+    NSBundle *packageBundle = kGlyphPackageBundle;
+    if (@available(iOS 13.0, *)) packageBundle = [NSBundle bundleWithPath:@"/System/Library/PrivateFrameworks/MediaControls.framework"];
+
+    glyphView.packageDescription = [NSClassFromString(@"CCUICAPackageDescription") descriptionForPackageNamed:kGlyphPackageName inBundle:packageBundle];
     glyphView.translatesAutoresizingMaskIntoConstraints = NO;
     glyphView.transform = CGAffineTransformMakeScale(0.7, 0.7);
     [self addSubview:glyphView];

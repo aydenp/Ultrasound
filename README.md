@@ -10,9 +10,8 @@ If you find a bug or code issue, report it on the [issues page](https://github.c
 
 ## Contributing
 
-Feel free to contribute to the source code of Ultrasound to make it something even better! Just try to adhere to the general coding style throughout, to make it as readable as possible.
+Feel free to contribute to the source code of Ultrasound to make it even better! Just try to adhere to the general coding style throughout to make it as readable as possible for future maintainers.
 
 ## License
 
 This project is licensed under the [MIT license](/LICENSE). Please make sure you comply with its terms while using it in any way.
-

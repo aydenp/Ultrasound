@@ -72,6 +72,8 @@
             @"iPad7,4": @"10.5",
             @"iPad7,5": @"9.7",
             @"iPad7,6": @"9.7",
+            @"iPad7,11": @"10.5",
+            @"iPad7,12": @"10.5",
             @"iPad8,1": @"11-bezelless",
             @"iPad8,2": @"11-bezelless",
             @"iPad8,3": @"11-bezelless",
@@ -79,7 +81,11 @@
             @"iPad8,5": @"12.9-bezelless",
             @"iPad8,6": @"12.9-bezelless",
             @"iPad8,7": @"12.9-bezelless",
-            @"iPad8,8": @"12.9-bezelless"
+            @"iPad8,8": @"12.9-bezelless",
+            @"iPad11,1": @"7.9",
+            @"iPad11,2": @"7.9",
+            @"iPad11,3": @"10.5",
+            @"iPad11,4": @"10.5"
         };
         group = iPads[model];
         if (!group) group = @"10.5";
@@ -104,9 +110,12 @@
             @"iPhone10,5": @"5.5",
             @"iPhone10,6": @"X",
             @"iPhone11,2": @"X",
-            @"iPhone11,4": @"X", // actually Xs Max but positioning is same
-            @"iPhone11,6": @"X", // actually Xs Max but positioning is same
-            @"iPhone11,8": @"Xr"
+            @"iPhone11,4": @"X", // actually Xs Max (same as X)
+            @"iPhone11,6": @"X", // actually Xs Max (same as X)
+            @"iPhone11,8": @"Xr", // iPhone XR
+            @"iPhone12,1": @"Xr", // actually iPhone 11 (same as XR)
+            @"iPhone12,3": @"X", // actually iPhone 11 Pro (same as X)
+            @"iPhone12,5": @"X", // actually iPhone 11 Pro Max (same as Xs Max / X)
         };
         group = iPhones[model];
     }

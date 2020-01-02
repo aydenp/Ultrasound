@@ -10,7 +10,7 @@
 #import "ABVolumeHUDIconGlyphProviding.h"
 
 typedef NS_ENUM(NSInteger, ABVolumeHUDVolumeMode) {
-    ABVolumeHUDVolumeModeAudioVolume,
+    ABVolumeHUDVolumeModeAudio,
     ABVolumeHUDVolumeModeRinger
 };
 

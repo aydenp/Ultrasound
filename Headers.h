@@ -13,9 +13,18 @@
 - (BOOL)setVolumeTo:(float)volume forCategory:(NSString *)category;
 @end
 
+@interface _SBHUDModel : NSObject
+- (NSString *)identifier;
+@end
+
 @interface SBMediaController : NSObject
 + (instancetype)sharedInstance;
-- (BOOL)isRingerMuted;
+- (BOOL)isRingerMuted; // iOS 12 and below
+@end
+
+@interface SBRingerControl : NSObject
+- (BOOL)isRingerMuted; // iOS 13+
+- (float)volume;
 @end
 
 @interface SBBacklightController : NSObject
@@ -28,6 +37,7 @@
 - (void)preventIdleSleep;
 @end
 
+// Renamed to CSCoverSheetViewController on iOS 13+
 @interface SBLockScreenViewControllerBase : UIViewController
 -(BOOL)isInScreenOffMode;
 -(BOOL)isShowingMediaControls;
@@ -36,15 +46,32 @@
 @interface SBLockScreenManager : NSObject
 @property (readonly) BOOL isUILocked;
 + (instancetype)sharedInstance;
-- (SBLockScreenViewControllerBase *)lockScreenViewController;
+
+- (SBLockScreenViewControllerBase *)lockScreenViewController; // iOS 12 and below
+- (SBLockScreenViewControllerBase *)coverSheetViewController; // iOS 13+
+
 - (BOOL)unlockUIFromSource:(int)source withOptions:(NSDictionary *)options;
 @end
 
-@interface VolumeControl : NSObject
+// Renamed to SBVolumeControl on iOS 13+
+@interface VolumeControl : NSObject {
+    SBRingerControl* _ringerControl; // iOS 13+
+}
+// iOS 12 and below
 + (instancetype)sharedVolumeControl;
 - (float)getMediaVolume;
 - (void)setMediaVolume:(float)volume;
 - (void)_presentVolumeHUDWithMode:(int)mode volume:(float)volume;
+
+// iOS 13+
++ (instancetype)sharedInstance;
+- (float)_getMediaVolumeForIAP;
+- (void)_setMediaVolumeForIAP:(float)volume;
+@end
+
+@interface SBMainWorkspace : NSObject
++ (instancetype)sharedInstance;
+@property (nonatomic,readonly) SBRingerControl *ringerControl; // iOS 13+
 @end
 
 @interface SBLiftToWakeManager : NSObject
