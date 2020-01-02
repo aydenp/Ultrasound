@@ -466,6 +466,18 @@ static BOOL isDisplayingOLEDVolume = NO;
 
 %end
 
+%hook SBSleepWakeHardwareButtonInteraction
+
+- (BOOL)consumeSinglePressUp {
+    if (enabled && isDisplayingOLEDVolume) {
+        wakeScreen();
+        return YES;
+    }
+    return %orig;
+}
+
+%end
+
 %end
 
 %ctor {
