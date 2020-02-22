@@ -9,6 +9,17 @@
 #import "ABVolumeHUDManager.h"
 #import "ABVolumeHUDContainerViewController.h"
 #import "ABVolumeHUDThemeDark.h"
+#import "ABVolumeHUDThemeExtraLight.h"
+#import <substrate.h>
+
+BOOL isDarkMode() {
+    switch (UIScreen.mainScreen.traitCollection.userInterfaceStyle) {
+        case UIUserInterfaceStyleDark:
+            return true;
+        case UIUserInterfaceStyleLight:
+            return false;
+    }
+}
 
 @implementation ABVolumeHUDManager {
     ABVolumeHUDContainerViewController *viewController;
@@ -63,11 +74,24 @@
     // If the HUD view still doesn't exist, just cancel.
     if (viewController == nil) return;
     
+    if (isDarkMode()) {
+        self.theme = [ABVolumeHUDThemeDark alloc];
+    }
+    else {
+        self.theme = [ABVolumeHUDThemeExtraLight alloc];
+    }
+
     [viewController.containerView volumeChangedTo:volume withMode:mode];
 }
 
 - (void)volumeChangedTo:(CGFloat)volume {
     [self volumeChangedTo:volume withMode:0];
+    if (isDarkMode()) {
+        self.theme = [ABVolumeHUDThemeDark alloc];
+    }
+    else {
+        self.theme = [ABVolumeHUDThemeExtraLight alloc];
+    }
 }
 
 - (BOOL)oledMode {
