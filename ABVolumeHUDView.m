@@ -10,6 +10,7 @@
 #import "ABVolumeHUDViewSettings.h"
 #import "ABVolumeHUDManager.h"
 #import "ABVolumeHUDPassthroughView.h"
+#import "NSObject+SafeKVC.h"
 
 #define kVolumeLabelDefaultFont [UIFont systemFontOfSize:13 weight:UIFontWeightBold]
 #define kVolumeLabelOverrideFont [UIFont systemFontOfSize:13 weight:UIFontWeightSemibold]
@@ -45,6 +46,11 @@
     backdropView = [[UIVisualEffectView alloc] init];
     backdropView.translatesAutoresizingMaskIntoConstraints = NO;
     backdropView.clipsToBounds = YES;
+    if (@available(iOS 13.0, *)) {
+        backdropView.layer.cornerCurve = kCACornerCurveContinuous;
+    } else {
+        [backdropView.layer safelySetValue:@(YES) forKey:@"continuousCorners"];
+    }
     [self addSubview:backdropView];
     [backdropView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
     [backdropView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
