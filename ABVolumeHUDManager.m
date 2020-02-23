@@ -10,7 +10,6 @@
 #import "ABVolumeHUDContainerViewController.h"
 #import "ABVolumeHUDThemeDark.h"
 #import "ABVolumeHUDThemeExtraLight.h"
-#import <substrate.h>
 
 BOOL isDarkMode() {
     switch (UIScreen.mainScreen.traitCollection.userInterfaceStyle) {
