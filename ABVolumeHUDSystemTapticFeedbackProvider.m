@@ -6,34 +6,30 @@
 //  Copyright © 2018 Ayden Panhuyzen. All rights reserved.
 //
 
-#import "Headers.h"
+#import <AudioToolbox/AudioToolbox.h>
 #import "ABVolumeHUDSystemTapticFeedbackProvider.h"
 
-#define kTapticFeedbackReason @"kABVolumeHUDSystemTapticFeedbackProviderRequestedWarmUpReason"
-#define kTapticFeedbackMask 0x6
-
 @implementation ABVolumeHUDSystemTapticFeedbackProvider {
-    SBFTapticEngine *engine;
+    UIImpactFeedbackGenerator *generator;
 }
 
 - (id)init {
     self = [super init];
     if (self) {
-        engine = [NSClassFromString(@"SBFTapticEngine") sharedInstance];
+        // support level: 0 = none, 1 = 6s, 2 = > 7 (new API)
+        NSInteger tapticSupportLevel = [[[UIDevice currentDevice] valueForKey:@"_feedbackSupportLevel"] integerValue];
+        if (tapticSupportLevel > 1) generator = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
     }
     return self;
 }
 
 - (void)actuate {
-    [engine actuateFeedback:0x0];
+    if (generator) [generator impactOccurred];
+    else AudioServicesPlaySystemSound(1519);
 }
 
 - (void)warmUp {
-    [engine warmUpForFeedback:kTapticFeedbackMask withReason:kTapticFeedbackReason];
-}
-
-- (void)coolDown {
-    [engine coolDownForFeedback:kTapticFeedbackMask withReason:kTapticFeedbackReason];
+    if (generator) [generator prepare];
 }
 
 @end

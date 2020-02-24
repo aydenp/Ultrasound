@@ -11,5 +11,4 @@
 @protocol ABVolumeHUDTapticFeedbackProviding <NSObject>
 - (void)actuate;
 - (void)warmUp;
-- (void)coolDown;
 @end

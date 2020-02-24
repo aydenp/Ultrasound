@@ -9,6 +9,8 @@
 #import "Headers.h"
 #import "NSObject+SafeKVC.h"
 #import "_ABVolumeHUDOrientationManager.h"
+#import "ABVolumeHUDSystemVolumeInfoProvider.h"
+#import "ABVolumeHUDSystemTapticFeedbackProvider.h"
 
 // Use boot backlight adjustment source as it will never be used by SpringBoard directly
 #define kWillowBacklightAdjustmentSource 15
@@ -33,16 +35,6 @@ static SBLockScreenViewControllerBase *getLockScreenViewController() {
     SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
     if ([manager respondsToSelector:@selector(coverSheetViewController)]) return [manager coverSheetViewController];
     if ([manager respondsToSelector:@selector(lockScreenViewController)]) return [manager lockScreenViewController];
-    return nil;
-}
-
-static VolumeControl *getVolumeControl() {
-    Class iOS12Class = NSClassFromString(@"VolumeControl");
-    if (iOS12Class && [iOS12Class respondsToSelector:@selector(sharedVolumeControl)]) return [iOS12Class sharedVolumeControl];
-
-    Class iOS13Class = NSClassFromString(@"SBVolumeControl");
-    if (iOS13Class && [iOS13Class respondsToSelector:@selector(sharedInstance)]) return [iOS13Class sharedInstance];
-
     return nil;
 }
 
@@ -74,7 +66,7 @@ static void applySettings() {
     [ABVolumeHUDViewSettings sharedSettings].enableHapticFeedback = enableHapticFeedback;
 
     // If we changed theme or style, show the volume HUD for a preview
-    if ((themeChanged || styleChanged) && enabled) [getVolumeControl() __us_presentVolumeHUDWithMode:ABVolumeHUDVolumeModeAudio];
+    if ((themeChanged || styleChanged) && enabled) [[ABVolumeHUDSystemVolumeInfoProvider activeVolumeControl] __us_presentVolumeHUDWithMode:ABVolumeHUDVolumeModeAudio];
 }
 
 static void loadSettings() {
@@ -101,12 +93,12 @@ static void loadSettings() {
     if (settings && settings[@"ShowVolumePercentageOLED"]) showOLEDVolumePercentage = [settings[@"ShowVolumePercentageOLED"] boolValue];
     if (settings && settings[@"Theme"]) {
         NSString *newThemeName = [settings[@"Theme"] stringValue];
-        themeChanged = themeName && ![themeName isEqualToString:newThemeName];
+        themeChanged = hasLoadedSettings && themeName && ![themeName isEqualToString:newThemeName];
         themeName = newThemeName;
     }
     if (settings && settings[@"ThemeInDarkMode"]) {
         NSString *newThemeName = [settings[@"ThemeInDarkMode"] stringValue];
-        themeChanged = themeChanged || (darkModeThemeName == nil) != (newThemeName == nil) || (darkModeThemeName && ![darkModeThemeName isEqualToString:newThemeName]); // this sucks
+        themeChanged = hasLoadedSettings && (themeChanged || (darkModeThemeName == nil) != (newThemeName == nil) || (darkModeThemeName && ![darkModeThemeName isEqualToString:newThemeName])); // this sucks
         darkModeThemeName = newThemeName;
     }
     if (settings && settings[@"Style"]) {
