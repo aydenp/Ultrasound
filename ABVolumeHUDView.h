@@ -30,4 +30,5 @@
 - (NSArray <UIView *>*)accessoryViews;
 - (void)volumeChangedTo:(CGFloat)volume withModeInfo:(ABVolumeHUDVolumeModeInfo *)modeInfo;
 - (void)setOLEDMode:(BOOL)oledMode animated:(BOOL)animated;
+- (void)applyThemeAnimated:(BOOL)animated;
 @end

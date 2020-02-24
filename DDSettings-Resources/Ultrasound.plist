@@ -63,6 +63,85 @@
 			<string>ABVolumeHUDThemeDark</string>
 			<key>key</key>
 			<string>Theme</string>
+			<key>OSRequirement</key>
+			<string>major &lt; 13</string>
+			<key>PostNotification</key>
+			<string>applebetas.ios.tweak.willow.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Theme (Light Mode)</string>
+			<key>validValues</key>
+			<array>
+				<string>ABVolumeHUDThemeDark</string>
+				<string>ABVolumeHUDThemeLight</string>
+				<string>ABVolumeHUDThemeExtraLight</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>Dark (Default)</string>
+				<string>Light</string>
+				<string>Extra Light</string>
+			</array>
+			<key>shortTitles</key>
+			<array>
+				<string>Dark</string>
+				<string>Light</string>
+				<string>Extra Light</string>
+			</array>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>defaults</key>
+			<string>applebetas.ios.tweak.willow</string>
+			<key>default</key>
+			<string>ABVolumeHUDThemeDark</string>
+			<key>key</key>
+			<string>Theme</string>
+			<key>OSRequirement</key>
+			<string>major >= 13</string>
+			<key>PostNotification</key>
+			<string>applebetas.ios.tweak.willow.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkListCell</string>
+			<key>label</key>
+			<string>Theme (Dark Mode)</string>
+			<key>validValues</key>
+			<array>
+				<string></string>
+				<string>ABVolumeHUDThemeDark</string>
+				<string>ABVolumeHUDThemeLight</string>
+				<string>ABVolumeHUDThemeExtraLight</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>Same as Light Mode (Default)</string>
+				<string>Dark</string>
+				<string>Light</string>
+				<string>Extra Light</string>
+			</array>
+			<key>shortTitles</key>
+			<array>
+				<string>Same as Light Mode</string>
+				<string>Dark</string>
+				<string>Light</string>
+				<string>Extra Light</string>
+			</array>
+			<key>detail</key>
+			<string>PSListItemsController</string>
+			<key>defaults</key>
+			<string>applebetas.ios.tweak.willow</string>
+			<key>default</key>
+			<string></string>
+			<key>key</key>
+			<string>ThemeInDarkMode</string>
+			<key>staticTextMessage</key>
+			<string>Choose to use a different Ultrasound theme while your device is in Dark Mode.</string>
+			<key>OSRequirement</key>
+			<string>major >= 13</string>
 			<key>PostNotification</key>
 			<string>applebetas.ios.tweak.willow.changed</string>
 		</dict>

@@ -1,10 +1,10 @@
 Package: applebetas.ios.tweak.willow
 Name: Ultrasound
 Depends: mobilesubstrate, firmware (>= 11.0), preferenceloader
-Version: 1.2.10
+Version: 1.2.11
 Architecture: iphoneos-arm
 Description: A brand-new, unobtrusive, OLED-friendly volume HUD.
 Maintainer: Ayden Panhuyzen
 Author: Ayden Panhuyzen
 Section: Tweaks
-Conflicts: com.ruler225.videohud, com.spark.melior, net.midkin.smartvolumecontrol2, es.ubikstyl.sonus12, me.nepeta.brokenhud, me.nepeta.flashyhud
+Conflicts: com.ruler225.videohud, com.spark.melior, net.midkin.smartvolumecontrol2, es.ubikstyl.sonus12, me.nepeta.brokenhud, me.nepeta.flashyhud, hi.my.name.is.ubik.sonus13, com.ikilledappl3.switchhud, com.muirey03.13hud, com.kingpuffdaddi.ringer13
