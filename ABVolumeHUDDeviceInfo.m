@@ -110,12 +110,12 @@
             @"iPhone10,5": @"5.5",
             @"iPhone10,6": @"X",
             @"iPhone11,2": @"X",
-            @"iPhone11,4": @"X", // actually Xs Max (same as X)
-            @"iPhone11,6": @"X", // actually Xs Max (same as X)
+            @"iPhone11,4": @"XsMax", // actually Xs Max
+            @"iPhone11,6": @"XsMax", // actually Xs Max
             @"iPhone11,8": @"Xr", // iPhone XR
             @"iPhone12,1": @"Xr", // actually iPhone 11 (same as XR)
             @"iPhone12,3": @"X", // actually iPhone 11 Pro (same as X)
-            @"iPhone12,5": @"X", // actually iPhone 11 Pro Max (same as Xs Max / X)
+            @"iPhone12,5": @"XsMax", // actually iPhone 11 Pro Max (same as Xs Max)
         };
         group = iPhones[model];
     }
@@ -136,6 +136,7 @@
     else if ([group isEqualToString:@"7.9-ringer"]) return [ABVolumeHUDDeviceInfo infoFor79InchWithRinger];
     else if ([group isEqualToString:@"7.9"]) return [ABVolumeHUDDeviceInfo infoFor79Inch];
     else if ([group isEqualToString:@"Xr"]) return [ABVolumeHUDDeviceInfo infoForXr];
+    else if ([group isEqualToString:@"XsMax"]) return [ABVolumeHUDDeviceInfo infoForXsMax];
     else return [ABVolumeHUDDeviceInfo infoForX];
 }
 
@@ -157,6 +158,10 @@
 
 + (instancetype)infoForXr {
     return [[ABVolumeHUDDeviceInfo alloc] initWithVolumeButtonTopOffset:163 andHeight:149 hasOLEDScreen:NO];
+}
+
++ (instancetype)infoForXsMax {
+    return [[ABVolumeHUDDeviceInfo alloc] initWithVolumeButtonTopOffset:170 andHeight:142 hasOLEDScreen:NO];
 }
 
 + (instancetype)infoFor4InchTouch {
