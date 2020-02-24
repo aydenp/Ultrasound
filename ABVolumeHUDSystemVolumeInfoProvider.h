@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Headers.h"
 #import "ABVolumeHUDVolumeInfoProviding.h"
 
 @interface ABVolumeHUDSystemVolumeInfoProvider : NSObject <ABVolumeHUDVolumeInfoProviding>
 - (CGFloat)volumeForVolumeMode:(ABVolumeHUDVolumeMode)mode;
++ (VolumeControl *)activeVolumeControl;
 @end

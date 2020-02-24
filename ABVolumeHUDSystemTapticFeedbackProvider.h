@@ -12,5 +12,4 @@
 @interface ABVolumeHUDSystemTapticFeedbackProvider : NSObject <ABVolumeHUDTapticFeedbackProviding>
 - (void)actuate;
 - (void)warmUp;
-- (void)coolDown;
 @end

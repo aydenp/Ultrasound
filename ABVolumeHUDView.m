@@ -275,7 +275,6 @@
         if (tapticProvider) [tapticProvider warmUp];
     } else {
         [[self.delegate visibilityManager] releaseProlongedDisplayForReason:@"slider_touch"];
-        if (tapticProvider) [tapticProvider coolDown];
     }
 }
 

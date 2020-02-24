@@ -227,7 +227,7 @@
             <key>label</key>
             <string>Behaviour</string>
 			<key>footerText</key>
-			<string>Play Haptic Feedback when adjusting the volume reaches 0% or 100%. Requires iPhone 7 or later.</string>
+			<string>Play Haptic Feedback when the volume reaches 0% or 100%. Requires iPhone 6s or later.</string>
         </dict>
 		<dict>
 			<key>cell</key>
@@ -308,6 +308,10 @@
 	</array>
 	<key>headerColour</key>
 	<string>0.161:0.173:0.212</string>
+	<key>tintColour</key>
+	<string>0.161:0.173:0.212</string>
+	<key>tintColour:dark</key>
+	<string>0.402:0.449:0.714</string>
 	<key>firstCopyrightYear</key>
 	<integer>2018</integer>
 	<key>showsDynasticBranding</key>

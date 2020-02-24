@@ -3,9 +3,6 @@
 #import "ABVolumeHUDWindow.h"
 #import "ABVolumeHUDViewSettings.h"
 #import "ABVolumeHUDDeviceInfo.h"
-#import "ABVolumeHUDSystemVolumeInfoProvider.h"
-#import "ABVolumeHUDSystemTapticFeedbackProvider.h"
-#import "dlfcn.h"
 
 @interface AVSystemController : NSObject
 + (instancetype)sharedAVSystemController;
@@ -87,14 +84,6 @@
 + (instancetype)sharedInstance;
 - (BOOL)isPearlDetectEnabled;
 - (void)noteScreenWillTurnOn;
-@end
-
-@interface SBFTapticEngine : NSObject
-+ (id)sharedInstance;
--(void)actuateFeedback:(long long)arg1 ;
--(BOOL)supportsFeedbackActuation;
--(void)warmUpForFeedback:(unsigned long long)arg1 withReason:(id)arg2 ;
--(void)coolDownForFeedback:(unsigned long long)arg1 withReason:(id)arg2 ;
 @end
 
 @interface SBTapToWakeController : NSObject
