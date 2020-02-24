@@ -22,6 +22,15 @@
     return (ABVolumeHUDContainerView *)self.view;
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    if (@available(iOS 13.0, *)) {
+        if (self.traitCollection.userInterfaceStyle == previousTraitCollection.userInterfaceStyle) return;
+        [self.containerView userInterfaceStyleChanged];
+    }
+}
+
 // Now required in addition to window-level security to display while locked: https://twitter.com/aydenpanhuyzen/status/1205981143377612800
 - (BOOL)_canShowWhileLocked {
     return YES;

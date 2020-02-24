@@ -127,6 +127,10 @@
     [self layoutIfNeeded];
 }
 
+- (void)userInterfaceStyleChanged {
+    [volumeHUD applyThemeAnimated:YES];
+}
+
 - (void)interactiveDismissPanned:(ABInstantPanGestureRecognizer *)gesture {
     CGFloat translation = [gesture translationInView:self].x;
     CGPoint velocity = [gesture velocityInView:self];

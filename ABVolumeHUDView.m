@@ -41,7 +41,7 @@
 
 - (void)setupForDisplay {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applySettings) name:kHUDSettingsChanged object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applyThemeWithNotification:) name:kThemeChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applyThemeWithNotification:) name:kThemeSettingsChangedNotification object:nil];
     
     backdropView = [[UIVisualEffectView alloc] init];
     backdropView.translatesAutoresizingMaskIntoConstraints = NO;

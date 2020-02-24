@@ -16,7 +16,7 @@
 #define kVolumeChangeNotification @"kABVolumeHUDVolumeChangedNotificationName"
 #define kVolumeModeChangeNotification @"kABVolumeHUDVolumeModeChangedNotificationName"
 #define kControlVisibilityChangedNotification @"kABVolumeHUDControlVisibilityChangedNotificationName"
-#define kThemeChangedNotification @"kABVolumeHUDThemeChangedNotificationName"
+#define kThemeSettingsChangedNotification @"kABVolumeHUDThemeChangedNotificationName"
 
 @interface ABVolumeHUDManager : NSObject
 + (instancetype)sharedManager;
@@ -25,9 +25,11 @@
 @property (nonatomic, readonly) ABVolumeHUDVisibilityManager *visibilityManager;
 @property (nonatomic, retain) NSObject <ABVolumeHUDVolumeInfoProviding>*volumeInfoProvider;
 @property (nonatomic, retain) NSObject <ABVolumeHUDTapticFeedbackProviding>*tapticFeedbackProvider;
-@property (nonatomic, retain) NSObject <ABVolumeHUDTheme>*theme;
+@property (nonatomic, retain) NSObject <ABVolumeHUDTheme>*lightModeTheme;
+@property (nonatomic, retain) NSObject <ABVolumeHUDTheme>*darkModeTheme;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 - (void)createViewIfDoesntExist;
+- (NSObject <ABVolumeHUDTheme>*)theme;
 - (void)volumeChangedTo:(CGFloat)volume withMode:(ABVolumeHUDVolumeMode)mode;
 - (void)volumeChangedTo:(CGFloat)volume;
 - (BOOL)oledMode;

@@ -17,4 +17,5 @@
 - (void)setOLEDMode:(BOOL)oledMode animated:(BOOL)animated;
 - (void)volumeChangedTo:(CGFloat)volume withMode:(ABVolumeHUDVolumeMode)mode;
 - (void)shouldSwitchModes;
+- (void)userInterfaceStyleChanged;
 @end

@@ -11,21 +11,10 @@
 #import "ABVolumeHUDThemeDark.h"
 #import "ABVolumeHUDThemeExtraLight.h"
 
-BOOL isDarkMode() {
-    switch (UIScreen.mainScreen.traitCollection.userInterfaceStyle) {
-        case UIUserInterfaceStyleDark:
-            return true;
-        case UIUserInterfaceStyleLight:
-            return false;
-    }
-}
-
 @implementation ABVolumeHUDManager {
     ABVolumeHUDContainerViewController *viewController;
     BOOL oledModeForHUDCreation;
 }
-
-@synthesize theme = _theme;
 
 + (instancetype)sharedManager {
     static ABVolumeHUDManager *sharedManager = nil;
@@ -72,25 +61,12 @@ BOOL isDarkMode() {
     [self createViewIfDoesntExist];
     // If the HUD view still doesn't exist, just cancel.
     if (viewController == nil) return;
-    
-    if (isDarkMode()) {
-        self.theme = [ABVolumeHUDThemeDark alloc];
-    }
-    else {
-        self.theme = [ABVolumeHUDThemeExtraLight alloc];
-    }
 
     [viewController.containerView volumeChangedTo:volume withMode:mode];
 }
 
 - (void)volumeChangedTo:(CGFloat)volume {
     [self volumeChangedTo:volume withMode:0];
-    if (isDarkMode()) {
-        self.theme = [ABVolumeHUDThemeDark alloc];
-    }
-    else {
-        self.theme = [ABVolumeHUDThemeExtraLight alloc];
-    }
 }
 
 - (BOOL)oledMode {
@@ -107,14 +83,23 @@ BOOL isDarkMode() {
 }
 
 - (NSObject <ABVolumeHUDTheme>*)theme {
-    if (!_theme) _theme = [[ABVolumeHUDThemeDark alloc] init];
-    return _theme;
+    if (@available(iOS 13.0, *)) {
+        if ([UIScreen mainScreen].traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark && _darkModeTheme) return _darkModeTheme;
+    }
+    if (!_lightModeTheme) _lightModeTheme = [[ABVolumeHUDThemeDark alloc] init];
+    return _lightModeTheme;
 }
 
-- (void)setTheme:(NSObject<ABVolumeHUDTheme> *)theme {
-    BOOL isChanged = _theme != theme;
-    _theme = theme;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kThemeChangedNotification object:nil userInfo:@{@"animated": @(isChanged)}];
+- (void)setLightModeTheme:(NSObject<ABVolumeHUDTheme> *)theme {
+    BOOL isChanged = _lightModeTheme != theme;
+    _lightModeTheme = theme;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kThemeSettingsChangedNotification object:nil userInfo:@{@"animated": @(isChanged)}];
+}
+
+- (void)setDarkModeTheme:(NSObject<ABVolumeHUDTheme> *)theme {
+    BOOL isChanged = _darkModeTheme != theme;
+    _darkModeTheme = theme;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kThemeSettingsChangedNotification object:nil userInfo:@{@"animated": @(isChanged)}];
 }
 
 - (void)setOrientation:(UIInterfaceOrientation)orientation {
