@@ -24,11 +24,11 @@
 }
 
 - (void)getUltrasound {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://repo.dynastic.co/package/ultrasound"]];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://repo.dynastic.co/package/ultrasound"] options:@{} completionHandler:nil];
 }
 
 - (void)followOnTwitter {
-	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/intent/follow?screen_name=aydenpanhuyzen"]];
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/intent/follow?screen_name=aydenpanhuyzen"] options:@{} completionHandler:nil];
 }
 
 @end
